@@ -4,19 +4,33 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using OpenQA.Selenium.Interactions;
 
 namespace SeleniumPractice
 {
     [TestClass]
     public class UnitTest
     {
+        ChromeDriver driver = null;
+
+        [TestInitialize]
+        public void SetUpDriver()
+        {
+            driver = new ChromeDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
+            driver.Manage().Window.Maximize();
+            driver.Url = "https://courses.letskodeit.com/practice";
+        }
+
+        [TestCleanup]
+        public void CloseDriver()
+        {
+            driver.Close();
+            driver.Quit();
+        }
+
         [TestMethod]
         public void FirstTest()
         {
-            ChromeDriver driver = new ChromeDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
-            driver.Manage().Window.Maximize();
-            driver.Url = "https://courses.letskodeit.com/practice";
-
             IWebElement headerLabel = driver.FindElement(By.XPath("//h1"));
             IWebElement firstname = driver.FindElement(By.Id("name"));
             IWebElement bmwRadioButton = driver.FindElement(By.Id("bmwradio"));
@@ -32,6 +46,7 @@ namespace SeleniumPractice
             Console.WriteLine(isSelected);
 
             bmwRadioButton.Click();
+            //Printing radio button is selected
             bool isSelectedAfterSelection = bmwRadioButton.Selected;
             Console.WriteLine(isSelectedAfterSelection);
             Console.WriteLine(benzCheckbox.Selected);
@@ -56,15 +71,20 @@ namespace SeleniumPractice
 
 
             SelectElement select1 = new SelectElement(multiSelectDropdown);
+            //select multiple options from a multi select dropdowns
             select1.SelectByText("Apple");
             select1.SelectByValue("orange");
+
+            //print all the selected options
             IList<IWebElement> list1 = select1.AllSelectedOptions;
             for (int i = 0; i < list1.Count; i++)
             {
                 Console.WriteLine(list1[i].Text);
             }
 
-            select.DeselectByText("Apple");
+            //Deselect one option from a multiselect dropdown
+            select1.DeselectByText("Apple");
+            //Get all the selected options and print
             IList<IWebElement> list2 = select1.AllSelectedOptions;
             for (int i = 0; i < list2.Count; i++)
             {
@@ -86,17 +106,69 @@ namespace SeleniumPractice
             Console.WriteLine(alert.Text);
 
             //To enter some values in alertbox
-            alert.SendKeys("");
+            //alert.SendKeys("");
 
             //TO specify username and password in alert
-            alert.SetAuthenticationCredentials("username", "password");
+            //alert.SetAuthenticationCredentials("username", "password");
 
             //To Cancel the alert
             alert.Dismiss();
-          
-            driver.Close();
-            driver.Quit();
+        }
 
+
+        [TestMethod]
+        public void VerifyButtonIsEnabledDisabed()
+        {
+        
+            IWebElement enableDisableInput = driver.FindElement(By.Id("enabled-example-input"));
+            IWebElement disableButton = driver.FindElement(By.Id("disabled-button"));
+
+            //Printing whether the button is enabled
+            Console.WriteLine(enableDisableInput.Enabled);
+
+            enableDisableInput.SendKeys("Test Automation");
+            disableButton.Click();
+            Console.WriteLine(enableDisableInput.Enabled);
+
+        }
+
+        [TestMethod]
+        public void VerifyButtonIsDisplayed()
+        {
+
+            IWebElement showHideInput = driver.FindElement(By.Name("show-hide"));
+            IWebElement hideButton = driver.FindElement(By.Id("hide-textbox"));
+
+            //Printing whether the button is enabled
+            Console.WriteLine(showHideInput.Displayed);
+
+            showHideInput.SendKeys("Test Automation");
+            hideButton.Click();
+            Console.WriteLine(showHideInput.Displayed);
+
+        }
+
+        [TestMethod]
+        public void VerifyTopButtonIsWorking()
+        {
+            IWebElement topButton = driver.FindElement(By.XPath("//a[text()='Top']"));
+            IWebElement mousehoverButton = driver.FindElement(By.Id("mousehover"));
+
+            Console.WriteLine(topButton.Displayed);
+
+            //Moving mouse pointer to the button
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(mousehoverButton).Perform();
+
+            //To perform right click
+            
+            //actions.ContextClick();
+
+            //To perform doiuble click
+            //actions.DoubleClick();
+
+            Console.WriteLine(topButton.Displayed);
+            topButton.Click();
         }
     }
 }
