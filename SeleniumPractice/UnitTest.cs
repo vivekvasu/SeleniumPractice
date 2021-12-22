@@ -170,5 +170,49 @@ namespace SeleniumPractice
             Console.WriteLine(topButton.Displayed);
             topButton.Click();
         }
+
+        [TestMethod]
+        public void VerifyMultipleWindows()
+        {
+            IWebElement openTabButton = driver.FindElement(By.Id("opentab"));
+
+            string mainWindow = driver.CurrentWindowHandle;
+            //tab 1 = "abc"
+            Console.WriteLine(mainWindow);
+
+            openTabButton.Click();
+
+            IList<string> tabsList =  driver.WindowHandles; // {"abc","def"}
+
+            Console.WriteLine($"Tab Count : {tabsList.Count}");   
+            // 2 tabs
+            //tab 1 = "abc" // 0
+            //tab 2 = "def" // 1
+
+            for(int i = 0; i < tabsList.Count; i++)
+            {
+                Console.WriteLine(tabsList[i]);
+                if(tabsList[i] != mainWindow)
+                {
+                    driver.SwitchTo().Window(tabsList[i]);
+                }
+            }
+
+            IWebElement searchInput = driver.FindElement(By.Id("search"));
+            Console.WriteLine(searchInput.Displayed);
+        }
+
+        [TestMethod]
+        public void VerifyIframe()
+        {
+            IWebElement frameElement = driver.FindElement(By.Id("courses-iframe"));
+            driver.SwitchTo().Frame(frameElement);
+            IWebElement searchInput = driver.FindElement(By.Id("search"));
+            Console.WriteLine(searchInput.Displayed);
+
+            driver.SwitchTo().DefaultContent();
+            IWebElement openTabButton = driver.FindElement(By.Id("opentab"));
+            Console.WriteLine(openTabButton.Displayed);
+        }
     }
 }
