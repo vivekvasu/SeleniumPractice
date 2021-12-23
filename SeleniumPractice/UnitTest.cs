@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
@@ -11,14 +12,25 @@ namespace SeleniumPractice
     [TestClass]
     public class UnitTest
     {
-        ChromeDriver driver = null;
+        IWebDriver driver = null;
 
         [TestInitialize]
         public void SetUpDriver()
         {
-            driver = new ChromeDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
+            //read notepad and check the value of browser
+            string browser = "chrome"; // firefox
+            if(browser.Equals("chrome"))
+            {
+                driver = new ChromeDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
+            }
+            else if (browser.Equals("firefox"))
+            {
+                driver = new FirefoxDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
+            }
+
             driver.Manage().Window.Maximize();
             driver.Url = "https://courses.letskodeit.com/practice";
+
         }
 
         [TestCleanup]
@@ -40,6 +52,8 @@ namespace SeleniumPractice
             IWebElement confirmButton = driver.FindElement(By.Id("confirmbtn"));
     
             Console.WriteLine(headerLabel.Text);
+            Assert.AreEqual("Practice Pages", headerLabel.Text);
+
             firstname.SendKeys("Test Automation");
 
             bool isSelected = bmwRadioButton.Selected;
@@ -123,6 +137,12 @@ namespace SeleniumPractice
             IWebElement enableDisableInput = driver.FindElement(By.Id("enabled-example-input"));
             IWebElement disableButton = driver.FindElement(By.Id("disabled-button"));
 
+            string attributeValue = disableButton.GetAttribute("value");
+
+            Console.WriteLine(attributeValue);
+
+            Assert.AreEqual("Disable", attributeValue);
+
             //Printing whether the button is enabled
             Console.WriteLine(enableDisableInput.Enabled);
 
@@ -184,7 +204,11 @@ namespace SeleniumPractice
 
             IList<string> tabsList =  driver.WindowHandles; // {"abc","def"}
 
-            Console.WriteLine($"Tab Count : {tabsList.Count}");   
+            Console.WriteLine($"Tab Count : {tabsList.Count}");
+
+            Assert.IsTrue(tabsList.Count == 2);
+            Assert.AreEqual(2, tabsList.Count);
+
             // 2 tabs
             //tab 1 = "abc" // 0
             //tab 2 = "def" // 1
@@ -205,14 +229,23 @@ namespace SeleniumPractice
         [TestMethod]
         public void VerifyIframe()
         {
+            //Launch url/application                Application should be launched    Application is launched
+            //Verify search input is displayed within frame     Input should be displayed          ....
+            //Verify opentab is displayed outside frame     opentab should be displayed          ....
+
             IWebElement frameElement = driver.FindElement(By.Id("courses-iframe"));
             driver.SwitchTo().Frame(frameElement);
             IWebElement searchInput = driver.FindElement(By.Id("search"));
-            Console.WriteLine(searchInput.Displayed);
+            bool actual = searchInput.Displayed;
+
+            //searchInput should be displayed
+            Assert.AreEqual(false, actual);
 
             driver.SwitchTo().DefaultContent();
             IWebElement openTabButton = driver.FindElement(By.Id("opentab"));
-            Console.WriteLine(openTabButton.Displayed);
+
+            //opentab should be displayed
+            Assert.AreEqual(true, openTabButton.Displayed);
         }
     }
 }
