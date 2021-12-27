@@ -4,41 +4,16 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using OpenQA.Selenium.Interactions;
+using SeleniumExtras.WaitHelpers;
 
 namespace SeleniumPractice
 {
     [TestClass]
-    public class UnitTest
+    public class UnitTest : BaseTest
     {
-        IWebDriver driver = null;
-
-        [TestInitialize]
-        public void SetUpDriver()
-        {
-            //read notepad and check the value of browser
-            string browser = "chrome"; // firefox
-            if(browser.Equals("chrome"))
-            {
-                driver = new ChromeDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
-            }
-            else if (browser.Equals("firefox"))
-            {
-                driver = new FirefoxDriver(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Drivers");
-            }
-
-            driver.Manage().Window.Maximize();
-            driver.Url = "https://courses.letskodeit.com/practice";
-
-        }
-
-        [TestCleanup]
-        public void CloseDriver()
-        {
-            driver.Close();
-            driver.Quit();
-        }
 
         [TestMethod]
         public void FirstTest()
@@ -189,6 +164,7 @@ namespace SeleniumPractice
 
             Console.WriteLine(topButton.Displayed);
             topButton.Click();
+            Assert.Fail();
         }
 
         [TestMethod]
@@ -246,6 +222,51 @@ namespace SeleniumPractice
 
             //opentab should be displayed
             Assert.AreEqual(true, openTabButton.Displayed);
+        }
+
+        [TestMethod]
+        public void TakeScreenshot()
+        {
+            //Dire
+            ITakesScreenshot screenshot = driver as ITakesScreenshot;
+            screenshot.GetScreenshot().SaveAsFile(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Screenshots\screenshot.jpeg");
+        }
+
+
+        [TestMethod]
+        public void DifferentTypesOfWaits()
+        {
+            By openTabButton = By.Id("opentab");
+
+            // Implicit Wait
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+
+            // Explicit Wait
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+            wait.Until(ExpectedConditions.ElementToBeClickable(openTabButton));
+
+            driver.FindElement(openTabButton).Click();
+
+            // Fluent Wait
+
+            // max wait 60 sec
+            // interval 10 sec
+            DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
+            fluentWait.Timeout = TimeSpan.FromSeconds(60);
+            fluentWait.PollingInterval = TimeSpan.FromSeconds(5);
+            fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+            fluentWait.Until(ExpectedConditions.ElementIsVisible(openTabButton));
+
+            driver.FindElement(openTabButton).Click();
+        }
+    
+
+        [TestMethod]
+        public void Elements()
+        {
+           IList<IWebElement> elements =  driver.FindElements(By.XPath("//input[@type='radio']"));
+           Console.WriteLine(elements.Count);
+           Assert.IsTrue(elements.Count == 3);
         }
     }
 }
