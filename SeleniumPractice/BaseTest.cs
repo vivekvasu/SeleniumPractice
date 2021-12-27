@@ -15,12 +15,13 @@ namespace SeleniumPractice
     {
         public IWebDriver driver;
 
-        private static TestContext TestContext;
+        private TestContext _testContext;
 
-        [ClassInitialize]
-        public static void InitializeClass(TestContext context)
-        {
-            TestContext = context;
+        public TestContext TestContext 
+        { 
+            get { return _testContext; }
+
+            set { _testContext = value; } 
         }
 
         [TestInitialize]
@@ -45,11 +46,11 @@ namespace SeleniumPractice
         [TestCleanup]
         public void CloseDriver()
         {
-            /*if(TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+            if(TestContext.CurrentTestOutcome == UnitTestOutcome.Failed)
             {
                 ITakesScreenshot screenshot = driver as ITakesScreenshot;
-                screenshot.GetScreenshot().SaveAsFile(@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Screenshots\screenshot.jpeg");
-            }*/
+                screenshot.GetScreenshot().SaveAsFile($@"C:\Users\Vivek Vasu\source\repos\SeleniumPractice\SeleniumPractice\Screenshots\{TestContext.TestName}.jpeg");
+            }
 
             driver.Close();
             driver.Quit();

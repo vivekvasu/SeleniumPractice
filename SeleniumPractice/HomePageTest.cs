@@ -10,13 +10,15 @@ using System.Threading.Tasks;
 
 namespace SeleniumPractice
 {
-    class HomePageTest : BaseTest
+    [TestClass]
+    public class HomePageTest : BaseTest
     {
-
         [TestMethod]
         public void VerifyButtonIsDisplayed()
         {
-            Console.WriteLine("Homepage Test");
+            HomePage homepage = new HomePage(driver);
+            Assert.AreEqual(3, homepage.GetElementsCount());
+            Assert.AreEqual("Practice Page", homepage.GetHeaderText());
         }
     }
 }
